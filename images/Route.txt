@@ -1,0 +1,4 @@
+这段代码Warehouse.routes.get(card.getPath())通过path拿到对应的RouteMeta，这个RouteMeta里面保存了activityClass等信息。继续往下看，如果判断拿到的RouteMeta是空，说明这个路由地址还没有加载到map里面(初始化时为了节省性能，只会加载所有的分组信息，而每个分组下的路由映射关系，会使用懒加载，在首次用到的时候去加载)，只有在第一次用到当前路由地址的时候，会去Warehouse.routes里面拿routeMeta，如果拿到的是空，会根据当前路由地址的group拿到对应的分组，通过反射创建实例，然后调用实例的loadInto方法，把它里面保存的映射信息添加到Warehouse.routes里面，并且再次调用prepareCard(card)，这时再通过Warehouse.routes.get(card.getPath())就可以顺利拿到RouteMeta了。进入else{}里面，调用了card.setDestination(routeMeta.getDestination())，这个setDestination就是将RouteMeta里面保存的activityClass放入Postcard里面。
+
+prepareCard()方法调用完成后，我们的postcard里面就保存了activityClass，然后switch (postcard.getType()){}会判断postcard的type为ACTIVITY，然后通过ActivityCompat.startActivity启动Activity。到这里，路由跳转的实现已经讲解完毕了。
+
